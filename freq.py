@@ -14,7 +14,7 @@ if __name__ == '__main__':
 			freq_view = [(v,k) for k, v in new_freq.items()]
 			freq_view.sort(reverse=True)
 			for v, k in freq_view:
-				print(k, v)
+				print(k, ":", v)
 		else:
 			print(line)
 			
