@@ -1,0 +1,101 @@
+#!/usr/bin/env python3
+import random
+
+def freq(string):
+	dic = {}
+	for s in string:
+		if s in dic:
+			dic[s] += 1
+		else:
+			dic[s] = 1
+	stat = [(v,k) for k, v in dic.items()]
+	stat.sort(reverse=True)
+	return stat
+
+def divide(msg, l):
+	divide = [""] * l
+	freqs = []
+	for i in range(l):
+		pointer = i
+		divide[i] += msg[i]
+		while (pointer + l) < len(msg):
+			pointer += l
+			divide[i] += msg[pointer]
+	for d in divide:
+		freqs.append(freq(d))
+	return freqs
+	
+def attack(ct, pt, kl):
+	key = [None] * kl
+	freq_ct = divide(ct, kl)
+	freq_pt = divide(pt, kl)
+	for i in range(kl):
+		for j in range(min(len(freq_ct[i]), len(freq_pt[i]))):
+			if freq_ct[i][j][0] == freq_pt[i][j][0]:
+				continue
+			else:
+				return ""
+	return pt
+	
+def encrypt(m, k):
+ 	
+ 	klen = len(k)
+ 	# encryption alg
+ 	ct = ""
+ 	pointer = 0
+ 	while pointer <= (len(m) - 1):
+ 		j = pointer % klen
+ 		if ord(m[pointer]) == 32:
+ 			prev = 0
+ 		else:
+ 			prev = ord(m[pointer]) - 96
+ 		now = (prev + k[j]) % 27
+ 		if now == 0:
+ 			ct += chr(32)
+ 		else:
+ 			ct += chr(96 + now)
+ 		pointer += 1
+ 	return ct
+			
+
+if __name__ == "__main__":
+#	ct = input("Enter the ciphertext: ")
+#	key = []
+#	for i in range(1,25):
+#		key.append(attack(ct, i))
+		
+	plaintext = []
+	with open("plaintext_dictionary_test1.txt") as f:
+		lines = list(line for line in (l.strip() for l in f) if line)
+	for line in lines:
+		if ord(line[0]) >= 97:
+			plaintext.append(line)
+	
+	# Randonly choose one of them
+	num = random.randint(0,len(plaintext)-1)
+	m = plaintext[num]
+
+	# Randomly generate key
+	k = []
+	klen = random.randint(1, 24)
+	for i in range(klen):
+		k.append(random.randint(0,26))
+		
+	# Encrypt message with regular vigenere cipher
+	ct = encrypt(m, k)
+	print(k)
+	print(num, m)
+	print(ct)
+	
+	# Attack
+	for kl in range(1, 25):
+		for pt in plaintext:
+			comp = attack(ct, pt, kl)
+			if comp == "":
+				continue
+			else:
+				print(comp)
+				exit()
+			
+		
+	
