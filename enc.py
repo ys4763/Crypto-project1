@@ -36,7 +36,7 @@ if __name__ == '__main__':
 				prev = 0
 			else:
 				prev = ord(m[message_pointer]) - 96
-			now = (prev + j) % 27
+			now = (prev + k[j]) % 27
 			if now == 0:
 				ct += chr(32)
 			else:
