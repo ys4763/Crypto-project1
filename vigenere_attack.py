@@ -12,7 +12,12 @@ def freq(string):
 			dic[s] = 1
 	stat = [(v,k) for k, v in dic.items()]
 	stat.sort(reverse=True)
-	return stat
+	#print(stat)
+	sq_sum = 0
+	for v, k in stat:
+		sq_sum += (v/len(string)) ** 2
+	#print(sq_sum)
+	return sq_sum
 
 # divide the list by key length and get frequencies of each substring
 def divide(msg, l):
@@ -34,12 +39,14 @@ def attack(ct, pt, kl):
 	key = [None] * kl
 	freq_ct = divide(ct, kl)
 	freq_pt = divide(pt, kl)
+	print(kl)
+	print(freq_ct)
+	print(freq_pt)
 	for i in range(kl):
-		for j in range(min(len(freq_ct[i]), len(freq_pt[i]))):
-			if freq_ct[i][j][0] == freq_pt[i][j][0]:
-				continue
-			else:
-				return ""
+		if freq_ct[i] == freq_pt[i]:
+			continue
+		else:
+			return ""
 	return pt
 	
 # the normal encryption for vigenere algorithm
@@ -89,7 +96,7 @@ if __name__ == "__main__":
 		
 	# Encrypt message with regular vigenere cipher
 	ct = encrypt(m, k)
-	print(k)
+	print(len(k), k)
 	print(num, m)
 	print(ct)
 	
@@ -99,6 +106,7 @@ if __name__ == "__main__":
 		# compare the ciphertext with each plaintext option
 		# under the certain key length guess
 		for pt in plaintext:
+		#pt = plaintext[0]
 			comp = attack(ct, pt, kl)
 			if comp == "":
 				continue
