@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import random
+import time
 
 # get the frequency of characters and then sort it into a list of tuples
 # in the format of (freq, character)
@@ -37,28 +38,34 @@ def divide(msg, l):
 # calculate the differences between square sums of frequency of each plaintext and ciphertext
 # find the smallest difference
 # doesn't matter what the key, just match the frequency
-def attack(ct, plaintext):
-	min_diff = 100 # initiate with a big number
+def attack(ct_list, plaintext):
 	pt_guess = ""
 	k = 0
-	for kl in range(1, 25):
-		for pt in plaintext:
-            # get the square sum of ct & pt in ley length kl
-			sqr_sum_ct = divide(ct, kl)
-			sqr_sum_pt = divide(pt, kl)
-			#print(sqr_sum_ct)
-			#print(sqr_sum_pt)
-			diff_sum = 0
-			for i in range(kl):
-				diff_sum += abs(sqr_sum_ct[i] - sqr_sum_pt[i])
-			diff = diff_sum / kl
-			print(kl, diff_sum, diff)
-			if diff < min_diff:
-				min_diff = diff
-				pt_guess = pt
-				k = kl
-	print(min_diff, k)
-	return pt_guess
+	diff_map = {}
+	for pt in plaintext:
+		print("================")
+		min_diff = 100
+		for ct in ct_list:
+			for kl in range(1, 25):
+				# get the square sum of ct & pt in ley length kl
+				sqr_sum_ct = divide(ct, kl)
+				sqr_sum_pt = divide(pt, kl)
+				#print(sqr_sum_ct)
+				#print(sqr_sum_pt)
+				diff_sum = 0
+				for i in range(kl):
+					diff_sum += abs(sqr_sum_ct[i] - sqr_sum_pt[i])
+				diff = diff_sum / kl
+				diff_map[kl] = diff
+			diff_list = [(v,k) for k, v in diff_map.items()]
+			diff_list.sort()
+			#print(diff_list[:10])
+			if diff_list[0][0] < min_diff:
+				min_diff = diff_list[0][0]
+				k = diff_list[0][1]
+		print(min_diff, k)
+ 	
+	return
 	
 # the normal encryption for vigenere algorithm
 def encrypt(m, k):
@@ -81,13 +88,23 @@ def encrypt(m, k):
 	return ct
 			
 def delete_random(ct, diff):
-    group_size = int((600 + diff) / diff) # delete 1 elements in each group
-    for i in range(diff, 0, -1):
-        ct = ct[:i * group_size] + ct[i * group_size + 1:]
-    return ct
+	ct_list = []
+	for k in range(1500):
+		temp = ct
+		list_of_numbers = list(range(0, 600 + diff))
+		for i in range(diff):
+			r = random.choice(list_of_numbers)
+			temp = temp[:r] + '-' + temp[r + 1:]
+			list_of_numbers.remove(r)
+		
+		temp = temp.replace("-", "")
+		ct_list.append(temp)
+
+	return ct_list
 
 
 if __name__ == "__main__":
+	start_time = time.time()
 	ct = input("Enter the ciphertext: ")
 #	key = []
 #	for i in range(1,25):
@@ -103,9 +120,12 @@ if __name__ == "__main__":
 	# Attack
 	# test by each key length
 	diff = len(ct) - 600
-	ct_600 = delete_random(ct, diff)
-	#print(len(ct), len(ct_600))
-	print(ct_600)
+	if diff == 0:
+		ct_600 = [ct]
+	else:
+		ct_600 = delete_random(ct, diff)
+	#print(ct_600)
 
 	comp = attack(ct_600, plaintext)
-	print("My guess is: " + comp)
+	print("--- %s seconds ---" % (time.time() - start_time))
+	#print("My guess is: " + comp)
