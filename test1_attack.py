@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import random
 import time
+import numpy as np
 
 # get the frequency of characters and then sort it into a list of tuples
 # in the format of (freq, character)
@@ -15,11 +16,11 @@ def freq(string):
 	stat = [(v,k) for k, v in dic.items()]
 	stat.sort(reverse=True)
 	#print(stat)
-	sq_sum = 0
+	freq_list = []
 	for v, k in stat:
-		sq_sum += (v/len(string)) ** 2
+		freq_list.append(v/len(string)) #** 2
 	#print(sq_sum)
-	return sq_sum
+	return freq_list
 
 # divide the list by key length and get frequencies of each substring
 def divide(msg, l):
@@ -31,40 +32,52 @@ def divide(msg, l):
 		while (pointer + l) < len(msg):
 			pointer += l
 			divide[i] += msg[pointer]
-	for d in divide:
-		freqs.append(freq(d))
-	return freqs # l groups of freq
-	
+	return divide
+
+
+def guess(ct, pt, kl):
+    ct_dvd = divide(ct, kl)
+    pt_dvd = divide(pt, kl)
+    sum = 0
+    for c, p in zip(ct_dvd, pt_dvd):
+        freq_c = freq(c)
+        freq_p = freq(p)
+        diff_sum = 0
+        for i in range(max(len(freq_c), len(freq_p))):
+            if i < len(freq_c) and i < len(freq_p):
+                diff_sum += (freq_c[i] - freq_p[i])** 2
+            elif i >= len(freq_c):
+                diff_sum += freq_p[i] ** 2
+            else:
+                diff_sum += freq_c[i] ** 2
+            sum += diff_sum / max(len(freq_c), len(freq_p))
+    #print(sum/kl)
+    return sum / kl
+
+
 # calculate the differences between square sums of frequency of each plaintext and ciphertext
 # find the smallest difference
 # doesn't matter what the key, just match the frequency
 def attack(ct_list, plaintext):
 	pt_guess = ""
 	k = 0
-	diff_map = {}
-	for pt in plaintext:
-		print("================")
+	record_sum = [[0 for i in range(24)] for j in range(5)]
+	for ct in ct_list:
 		min_diff = 100
-		for ct in ct_list:
+		for i in range(5):
+			#print("plaintext " + str(i))
 			for kl in range(1, 25):
-				# get the square sum of ct & pt in ley length kl
-				sqr_sum_ct = divide(ct, kl)
-				sqr_sum_pt = divide(pt, kl)
-				#print(sqr_sum_ct)
-				#print(sqr_sum_pt)
-				diff_sum = 0
-				for i in range(kl):
-					diff_sum += abs(sqr_sum_ct[i] - sqr_sum_pt[i])
-				diff = diff_sum / kl
-				diff_map[kl] = diff
-			diff_list = [(v,k) for k, v in diff_map.items()]
-			diff_list.sort()
-			#print(diff_list[:10])
-			if diff_list[0][0] < min_diff:
-				min_diff = diff_list[0][0]
-				k = diff_list[0][1]
-		print(min_diff, k)
- 	
+				diff = guess(ct, plaintext[i], kl)
+				record_sum[i][kl - 1] += diff
+				#if diff < min_diff:
+				#	min_diff = diff
+				#	pt_num = i
+				#	k = kl
+		#record[pt_num] += 1
+	record_sum = np.array(record_sum)
+	for i in range(24):
+		print(i + 1, record_sum[:, i])
+	#print(k)p
 	return
 	
 # the normal encryption for vigenere algorithm
@@ -89,7 +102,7 @@ def encrypt(m, k):
 			
 def delete_random(ct, diff):
 	ct_list = []
-	for k in range(1500):
+	for k in range(500):
 		temp = ct
 		list_of_numbers = list(range(0, 600 + diff))
 		for i in range(diff):
