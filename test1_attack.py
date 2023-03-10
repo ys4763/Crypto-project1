@@ -3,6 +3,7 @@ import random
 import time
 import numpy as np
 
+
 # get the frequency of characters and then sort it into a list of tuples
 # in the format of (freq, character)
 # return the sqr sum of freq of the string
@@ -16,11 +17,13 @@ def freq(string):
 	stat = [(v,k) for k, v in dic.items()]
 	stat.sort(reverse=True)
 	#print(stat)
+
 	freq_list = []
 	for v, k in stat:
 		freq_list.append(v/len(string)) #** 2
 	#print(sq_sum)
 	return freq_list
+
 
 # divide the list by key length and get frequencies of each substring
 def divide(msg, l):
@@ -32,6 +35,7 @@ def divide(msg, l):
 		while (pointer + l) < len(msg):
 			pointer += l
 			divide[i] += msg[pointer]
+
 	return divide
 
 
@@ -101,6 +105,7 @@ def encrypt(m, k):
 	return ct
 			
 def delete_random(ct, diff):
+
 	ct_list = []
 	for k in range(500):
 		temp = ct
@@ -118,6 +123,7 @@ def delete_random(ct, diff):
 
 if __name__ == "__main__":
 	start_time = time.time()
+  
 	ct = input("Enter the ciphertext: ")
 #	key = []
 #	for i in range(1,25):
@@ -133,6 +139,7 @@ if __name__ == "__main__":
 	# Attack
 	# test by each key length
 	diff = len(ct) - 600
+
 	if diff == 0:
 		ct_600 = [ct]
 	else:
@@ -142,3 +149,4 @@ if __name__ == "__main__":
 	comp = attack(ct_600, plaintext)
 	print("--- %s seconds ---" % (time.time() - start_time))
 	#print("My guess is: " + comp)
+

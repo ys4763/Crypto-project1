@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import random
+
 def freq(string):
 	dic = {}
 	for s in string:
@@ -17,6 +18,7 @@ def freq(string):
 	#print(sq_sum)
 	return sq_sum
 
+# divide the list by key length and get frequencies of each substring
 def divide(msg, l):
 	divide = [""] * l
 	freqs = []
@@ -30,6 +32,8 @@ def divide(msg, l):
 		freqs.append(freq(d))
 	return freqs
 	
+# compare the frequency of each plaintext and ciphertext
+# doesn't matter what the key, just match the frequency
 def attack(ct, pt, kl):
 	key = [None] * kl
 	freq_ct = divide(ct, kl)
@@ -48,7 +52,9 @@ def attack(ct, pt, kl):
 		else:
 			return ""
 	return pt
-
+  
+  
+  
 def encrypt(m, k):
  	
  	klen = len(k)
@@ -99,7 +105,10 @@ if __name__ == "__main__":
 	print(ct)
 
 	# Attack
+	# test by each key length
 	for kl in range(1, 25):
+		# compare the ciphertext with each plaintext option
+		# under the certain key length guess
 		for pt in plaintext:
 		#pt = plaintext[0]
 			comp = attack(ct, pt, kl)
