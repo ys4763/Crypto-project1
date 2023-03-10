@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import random
 import time
+import numpy as np
 
 # get the frequency of characters and then sort it into a list of tuples
 # in the format of (freq, character)
@@ -41,13 +42,15 @@ def guess(ct, pt, kl):
     for c, p in zip(ct_dvd, pt_dvd):
         freq_c = freq(c)
         freq_p = freq(p)
+        diff_sum = 0
         for i in range(max(len(freq_c), len(freq_p))):
             if i < len(freq_c) and i < len(freq_p):
-                sum += abs(freq_c[i] - freq_p[i])
+                diff_sum += (freq_c[i] - freq_p[i])** 2
             elif i >= len(freq_c):
-                sum += freq_p[i]
+                diff_sum += freq_p[i] ** 2
             else:
-                sum += freq_c[i]
+                diff_sum += freq_c[i] ** 2
+            sum += diff_sum / max(len(freq_c), len(freq_p))
     #print(sum/kl)
     return sum / kl
 
@@ -58,20 +61,23 @@ def guess(ct, pt, kl):
 def attack(ct_list, plaintext):
 	pt_guess = ""
 	k = 0
-	record = [0] * 5
+	record_sum = [[0 for i in range(24)] for j in range(5)]
 	for ct in ct_list:
 		min_diff = 100
 		for i in range(5):
-			print("plaintext " + str(i))
+			#print("plaintext " + str(i))
 			for kl in range(1, 25):
 				diff = guess(ct, plaintext[i], kl)
-				if diff < min_diff:
-					min_diff = diff
-					pt_num = i
-					k = kl
-		record[pt_num] += 1
-	print(record)
-	print(k)
+				record_sum[i][kl - 1] += diff
+				#if diff < min_diff:
+				#	min_diff = diff
+				#	pt_num = i
+				#	k = kl
+		#record[pt_num] += 1
+	record_sum = np.array(record_sum)
+	for i in range(24):
+		print(i + 1, record_sum[:, i])
+	#print(k)p
 	return
 	
 # the normal encryption for vigenere algorithm
@@ -96,7 +102,7 @@ def encrypt(m, k):
 			
 def delete_random(ct, diff):
 	ct_list = []
-	for k in range(1000):
+	for k in range(500):
 		temp = ct
 		list_of_numbers = list(range(0, 600 + diff))
 		for i in range(diff):
