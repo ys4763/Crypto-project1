@@ -1,66 +1,61 @@
 #!/usr/bin/env python3
 import random
+import time
 
-def delete_random(ct, diff):
-	group_size = int((600 + diff) / diff) # delete 1 elements in each group
-	for i in range(diff, 0, -1):
-		ct = ct[:i * group_size] + ct[i * group_size + 1:]
-	return ct
-	
-def freq(string):
-	dic = {}
-	for s in string:
-		if s in dic:
-			dic[s] += 1
+# This will be a quite brute-force approach that I just want to try
+
+def bf(pt, ct, t, index):
+	# The first character in both strings
+	p = ord(pt[index])
+	c = ord(ct[index])
+	if c == 32:
+		shift = 123 - p
+	else:
+		shift = (c - p) % 27
+	p_pointer = index + t
+	c_pointer = index + t
+	while p_pointer < len(pt):
+		# print(p_pointer)
+		if len(ct) - c_pointer < len(pt) - p_pointer:
+			#print(p_pointer, c_pointer)
+			return False
+		cp = ord(ct[c_pointer])
+		pp = ord(pt[p_pointer])
+		if cp == 32:
+			if shift == (123 - pp):
+				p_pointer += t
+				c_pointer += t
+			elif shift == 0 and pp == 32:
+				p_pointer += t
+				c_pointer += t
+			else:
+				c_pointer += 1
 		else:
-			dic[s] = 1
-	stat = [(v,k) for k, v in dic.items()]
-	stat.sort(reverse=True)
-	#print(stat)
-	sq_sum = 0
-	for v, k in stat:
-		sq_sum += (v/len(string)) ** 2
-	#print(sq_sum)
-	return sq_sum
+			if ((cp - pp) % 27) == shift:
+				p_pointer += t
+				c_pointer += t
+			elif pp == 32 and cp == (shift + 96):
+				p_pointer += t
+				c_pointer += t
+			else:
+				c_pointer += 1
+	return True
 
-# divide the list by key length and get frequencies of each substring
-def divide(msg, l):
-	divide = [""] * l
-	freqs = []
-	for i in range(l):
-		pointer = i
-		divide[i] += msg[i]
-		while (pointer + l) < len(msg):
-			pointer += l
-			divide[i] += msg[pointer]
-	for d in divide:
-		freqs.append(freq(d))
-	sum_fq = 0
-	for f in freqs:
-		sum_fq += f
-	avg = sum_fq / len(freqs)
-	return avg
-	
-# compare the frequency of each plaintext and ciphertext
-# doesn't matter what the key, just match the frequency
-def attack(ct, plaintext):
-	count = [0]*5
-	for kl in range(1, 25):
-		freq_ct = divide(ct, kl)
-		print(kl)
-		print(freq_ct)
-		for i in range(5):
-			freq_pt = divide(plaintext[i], kl)
-			print(freq_pt)
-			count[i] += abs(freq_ct-freq_pt)
-		
-	print(count)
-	exit()
-	
-		
-			
-			
-			
+def attack(pt, ct):
+	index = 0
+	for t in range(1, 25):
+		# index = 0
+		for i in range(len(pt)):
+			if bf(pt[i], ct, t, index):
+				print(t)
+				return i + 1
+				# I would like to try the first few characters in plaintext
+				# To check if this could be the possible key length
+				# for this specific plaintext
+				#if index < 3:
+				#	index += 1
+				#else:
+				#	return i + 1
 			
 if __name__ == "__main__":
 	
@@ -75,11 +70,11 @@ if __name__ == "__main__":
 		if ord(line[0]) >= 97:
 			plaintext.append(line)
 	
-	# Randomly delete characters to make it of length 600
-	ct = delete_random(ct, len(ct) - 600)
-	choice = attack(ct, plaintext)
-		
-	
-	
+	pointer = 1
+	choice = attack(plaintext, ct)
+	while choice == None and pointer <= len(ct) - len(plaintext[0]) :
+		choice = attack(plaintext, ct[pointer:])
+		#print(pointer)
+		pointer += 1
 	
 	print("My plaintext guess is: " + str(choice))
