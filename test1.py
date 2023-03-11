@@ -15,9 +15,9 @@ def bf(pt, ct, t, index):
 	p_pointer = index + t
 	c_pointer = index + t
 	while p_pointer < len(pt):
-		print(p_pointer)
+		# print(p_pointer)
 		if len(ct) - c_pointer < len(pt) - p_pointer:
-			print(p_pointer, c_pointer)
+			#print(p_pointer, c_pointer)
 			return False
 		cp = ord(ct[c_pointer])
 		pp = ord(pt[p_pointer])
@@ -25,10 +25,16 @@ def bf(pt, ct, t, index):
 			if shift == (123 - pp):
 				p_pointer += t
 				c_pointer += t
+			elif shift == 0 and pp == 32:
+				p_pointer += t
+				c_pointer += t
 			else:
 				c_pointer += 1
 		else:
 			if ((cp - pp) % 27) == shift:
+				p_pointer += t
+				c_pointer += t
+			elif pp == 32 and cp == (shift + 96):
 				p_pointer += t
 				c_pointer += t
 			else:
@@ -41,6 +47,7 @@ def attack(pt, ct):
 		# index = 0
 		for i in range(len(pt)):
 			if bf(pt[i], ct, t, index):
+				print(t)
 				return i + 1
 				# I would like to try the first few characters in plaintext
 				# To check if this could be the possible key length
