@@ -13,12 +13,13 @@ if __name__ == '__main__':
 	
 	# Randonly choose one of them
 	num = random.randint(0,len(plaintext)-1)
+	print(num)
 	m = plaintext[num]
 	
 	# Randomly determine the key as a list of integers range 0-26 (a-z+space)
 	k = []
-	klen = 5 # make it 5 first...
-	#klen = random.randint(1, 24)
+	#klen = 5 # make it 5 first...
+	klen = random.randint(1, 24)
 	for i in range(klen):
 		k.append(random.randint(0,26))
 	
@@ -49,6 +50,10 @@ if __name__ == '__main__':
 			else:
 				ct += chr(96 + rand_char)
 			num_rand_characters += 1
+			print(ciphertext_pointer)
 		ciphertext_pointer += 1
 	
+	print("key length: " + str(klen))
+	print("key: " + str(k))
+	print("The ciphertext is: " + str(num))
 	print(ct)
