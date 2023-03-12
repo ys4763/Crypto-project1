@@ -2,6 +2,8 @@
 import random
 
 if __name__ == '__main__':
+	'''
+	# this is for test 1
 	
 	# Read in 5 (or more) plaintext options
 	plaintext = []
@@ -13,8 +15,10 @@ if __name__ == '__main__':
 	
 	# Randonly choose one of them
 	num = random.randint(0,len(plaintext)-1)
-	print(num)
+	#print(num)
 	m = plaintext[num]
+	'''
+	m  = input("For test2, please enter a plaintext: ")
 	
 	# Randomly determine the key as a list of integers range 0-26 (a-z+space)
 	k = []
@@ -30,7 +34,8 @@ if __name__ == '__main__':
 	num_rand_characters = 0
 	prob_of_random_ciphertext = 0.05
 	while ciphertext_pointer <= (len(m) + num_rand_characters - 1):
-		coin_value = random.random()
+		coin_value = random.random() #coin_generation_algorithm(ciphertext_pointer, klen, 600)
+		#print(coin_value)
 		if prob_of_random_ciphertext <= coin_value <= 1:
 			j = message_pointer % klen
 			if ord(m[message_pointer]) == 32:
@@ -50,10 +55,10 @@ if __name__ == '__main__':
 			else:
 				ct += chr(96 + rand_char)
 			num_rand_characters += 1
-			print(ciphertext_pointer)
 		ciphertext_pointer += 1
 	
 	print("key length: " + str(klen))
 	print("key: " + str(k))
-	print("The ciphertext is: " + str(num))
+	print("ciphertext length: " + str(len(ct)))
+	#print("The plaintext is: " + str(num))
 	print(ct)

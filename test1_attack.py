@@ -14,7 +14,7 @@ def freq(string):
 		else:
 			dic[s] = 1
 	stat = [(v,k) for k, v in dic.items()]
-	stat.sort(reverse=True)
+	#stat.sort(reverse=True)
 	#print(stat)
 	freq_list = []
 	for v, k in stat:
@@ -42,6 +42,9 @@ def guess(ct, pt, kl):
     for c, p in zip(ct_dvd, pt_dvd):
         freq_c = freq(c)
         freq_p = freq(p)
+        #print("=================")
+        #print(freq_c)
+        #print(freq_p)
         diff_sum = 0
         for i in range(max(len(freq_c), len(freq_p))):
             if i < len(freq_c) and i < len(freq_p):
@@ -50,7 +53,7 @@ def guess(ct, pt, kl):
                 diff_sum += freq_p[i] ** 2
             else:
                 diff_sum += freq_c[i] ** 2
-            sum += diff_sum / max(len(freq_c), len(freq_p))
+        sum += diff_sum / max(len(freq_c), len(freq_p))
     #print(sum/kl)
     return sum / kl
 
@@ -67,6 +70,7 @@ def attack(ct_list, plaintext):
 		for i in range(5):
 			#print("plaintext " + str(i))
 			for kl in range(1, 25):
+				print(i, kl)
 				diff = guess(ct, plaintext[i], kl)
 				record_sum[i][kl - 1] += diff
 				#if diff < min_diff:
@@ -102,7 +106,7 @@ def encrypt(m, k):
 			
 def delete_random(ct, diff):
 	ct_list = []
-	for k in range(500):
+	for k in range(2):
 		temp = ct
 		list_of_numbers = list(range(0, 600 + diff))
 		for i in range(diff):
